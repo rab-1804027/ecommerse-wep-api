@@ -11,13 +11,19 @@ POST http://localhost:5052/api/categories
 Content-Type: application/json
 
 {
-    "name" : "Electronics",
+    "name" : "Electoric",
     "description" : "Devices and gadgets including phones, laptops, and other electronic equipment"
 }
 
 ### 
 
-PUT http://localhost:5052/api/categories
+PUT http://localhost:5052/api/categories/a82919e0-9ee2-45e4-854f-4c50e05afc46
+Content-Type: application/json
+
+{
+    "name" : "Eletronic device",
+    "description" : "Devices and gadgets including phones, laptops, and other electronic equipment"
+}
 
 ### 
 

@@ -74,18 +74,18 @@ app.MapPost("/api/categories", ([FromBody] Category categoryData ) => {
     categories.Add(newCategory);
 
     return Results.Created($"/api/categories/{newCategory.CategoryId}", newCategory);
-}
-);
-/*
-app.MapPut("/api/categories", () => {
-    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == Guid.Parse("17d5cb01-c659-4248-a7d9-b4554b7446af"));
+});
+
+app.MapPut("/api/categories/{categoriesId}", (Guid categoriesId, [FromBody] Category categoryData) => {
+    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoriesId);
  
     if(foundCategory == null)
     {
         return Results.NotFound("Category with this id does not exists");
     }
     
-    foundCategory.Name = "smart phone";
+    foundCategory.Name = categoryData.Name;
+    foundCategory.Description = categoryData.Description;
 
     return Results.NoContent();
 
@@ -102,7 +102,7 @@ app.MapDelete("/api/categories", () => {
     categories.Remove(foundCategory);
     return Results.NoContent();
 
-}); */
+});
 
 app.Run();
 

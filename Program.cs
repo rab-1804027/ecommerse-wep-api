@@ -1,4 +1,6 @@
 using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,10 @@ if(app.Environment.IsDevelopment()){
 }
 
 app.UseHttpsRedirection( );
+
+/* 
+
+/// Anisul Islam part 6 prjnto
 
 var products = new List<Product>(){
     new Product("Samsung20", 1240),
@@ -47,7 +53,64 @@ app.MapDelete("/", ()=>{
     return Results.NoContent();
 });
 
+*/
+
+List<Category> categories = new List<Category>();
+
+app.MapGet("/api/categories", () => {
+    return Results.Ok(categories);
+}
+);
+
+app.MapPost("/api/categories", ([FromBody] Category categoryData ) => {
+    var newCategory = new Category
+    {
+        CategoryId = Guid.NewGuid(),
+        Name = categoryData.Name,
+        Description = categoryData.Description,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    categories.Add(newCategory);
+
+    return Results.Created($"/api/categories/{newCategory.CategoryId}", newCategory);
+}
+);
+/*
+app.MapPut("/api/categories", () => {
+    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == Guid.Parse("17d5cb01-c659-4248-a7d9-b4554b7446af"));
+ 
+    if(foundCategory == null)
+    {
+        return Results.NotFound("Category with this id does not exists");
+    }
+    
+    foundCategory.Name = "smart phone";
+
+    return Results.NoContent();
+
+});
+
+app.MapDelete("/api/categories", () => {
+    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == Guid.Parse("17d5cb01-c659-4248-a7d9-b4554b7446af"));
+
+    if(foundCategory == null)
+    {
+        return Results.NotFound("Category with this id does not exists");
+    }
+
+    categories.Remove(foundCategory);
+    return Results.NoContent();
+
+}); */
+
 app.Run();
 
-public record Product(string Name, decimal Price);
+public record Category
+{
+    public Guid CategoryId { get; set; }
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public DateTime CreatedAt { get; set; } 
+}
  

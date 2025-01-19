@@ -1,18 +1,24 @@
 
-GET http://localhost:5051
+GET http://localhost:5052
 
 ###
 
-GET http://localhost:5051/hello
+GET http://localhost:5052/api/categories
 
 ###
 
-POST http://localhost:5051
+POST http://localhost:5052/api/categories
+Content-Type: application/json
+
+{
+    "name" : "Electronics",
+    "description" : "Devices and gadgets including phones, laptops, and other electronic equipment"
+}
 
 ### 
 
-PUT http://localhost:5051
+PUT http://localhost:5052/api/categories
 
 ### 
 
-DELETE http://localhost:5051
+DELETE http://localhost:5052/api/categories

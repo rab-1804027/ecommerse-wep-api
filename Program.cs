@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// /// For swagger api testing
+/// for controller
+builder.Services.AddControllers();
+/// For swagger api testing
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -55,90 +57,7 @@ app.MapDelete("/", ()=>{
 
 */
 
-List<Category> categories = new List<Category>();
+app.MapPost("/", ( ) => "Api is working fine");
 
-app.MapGet("/api/categories", ([FromQuery] string searchValue = "") => {
-
-  //  Console.WriteLine($"Search Value: {searchValue}");
-    if(!string.IsNullOrEmpty(searchValue))
-    {
-        var searchedCategories = categories.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
-       // Console.WriteLine($"Found Categories: {searchedCategories.Count}");
-        return Results.Ok(searchedCategories);
-    }
-
-    return Results.Ok(categories);
-}
-);
-
-app.MapPost("/api/categories", ([FromBody] Category categoryData ) => {
-    
-    /// input validation
-    if(string.IsNullOrEmpty(categoryData.Name))
-    {
-        return Results.BadRequest("Category name is required and can not be empty");
-    }
-
-    var newCategory = new Category
-    {
-        CategoryId = Guid.NewGuid(),
-        Name = categoryData.Name,
-        Description = categoryData.Description,
-        CreatedAt = DateTime.UtcNow
-    };
-
-    categories.Add(newCategory);
-
-    return Results.Created($"/api/categories/{newCategory.CategoryId}", newCategory);
-});
-
-app.MapPut("/api/categories/{categoriesId}", (Guid categoriesId, [FromBody] Category categoryData) => {
-    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoriesId);
- 
-    if(foundCategory == null)
-    {
-        return Results.NotFound("Category with this id does not exists");
-    }
-
-    if(categoryData == null)
-    {
-        return Results.BadRequest("Category data is missing");
-    }
-
-    if(!string.IsNullOrEmpty(categoryData.Name))
-    {
-        foundCategory.Name = categoryData.Name;
-    }
-    
-    if(!string.IsNullOrEmpty(categoryData.Description))
-    {
-        foundCategory.Description = categoryData.Description;
-    }
-
-    return Results.NoContent();
-
-});
-
-app.MapDelete("/api/categories/{categoryId}", (Guid categoryId) => {
-    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoryId);
-
-    if(foundCategory == null)
-    {
-        return Results.NotFound("Category with this id does not exists");
-    }
-
-    categories.Remove(foundCategory);
-    return Results.NoContent();
-
-});
-
+app.MapControllers();
 app.Run();
-
-public record Category
-{
-    public Guid CategoryId { get; set; }
-    public string? Name { get; set; }
-    public string? Description { get; set; }
-    public DateTime CreatedAt { get; set; } 
-}
- 

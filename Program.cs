@@ -72,6 +72,13 @@ app.MapGet("/api/categories", ([FromQuery] string searchValue = "") => {
 );
 
 app.MapPost("/api/categories", ([FromBody] Category categoryData ) => {
+    
+    /// input validation
+    if(string.IsNullOrEmpty(categoryData.Name))
+    {
+        return Results.BadRequest("Category name is required and can not be empty");
+    }
+
     var newCategory = new Category
     {
         CategoryId = Guid.NewGuid(),
@@ -92,9 +99,21 @@ app.MapPut("/api/categories/{categoriesId}", (Guid categoriesId, [FromBody] Cate
     {
         return Results.NotFound("Category with this id does not exists");
     }
+
+    if(categoryData == null)
+    {
+        return Results.BadRequest("Category data is missing");
+    }
+
+    if(!string.IsNullOrEmpty(categoryData.Name))
+    {
+        foundCategory.Name = categoryData.Name;
+    }
     
-    foundCategory.Name = categoryData.Name;
-    foundCategory.Description = categoryData.Description;
+    if(!string.IsNullOrEmpty(categoryData.Description))
+    {
+        foundCategory.Description = categoryData.Description;
+    }
 
     return Results.NoContent();
 

@@ -57,7 +57,16 @@ app.MapDelete("/", ()=>{
 
 List<Category> categories = new List<Category>();
 
-app.MapGet("/api/categories", () => {
+app.MapGet("/api/categories", ([FromQuery] string searchValue = "") => {
+
+  //  Console.WriteLine($"Search Value: {searchValue}");
+    if(!string.IsNullOrEmpty(searchValue))
+    {
+        var searchedCategories = categories.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
+       // Console.WriteLine($"Found Categories: {searchedCategories.Count}");
+        return Results.Ok(searchedCategories);
+    }
+
     return Results.Ok(categories);
 }
 );
@@ -91,8 +100,8 @@ app.MapPut("/api/categories/{categoriesId}", (Guid categoriesId, [FromBody] Cate
 
 });
 
-app.MapDelete("/api/categories", () => {
-    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == Guid.Parse("17d5cb01-c659-4248-a7d9-b4554b7446af"));
+app.MapDelete("/api/categories/{categoryId}", (Guid categoryId) => {
+    var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoryId);
 
     if(foundCategory == null)
     {

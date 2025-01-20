@@ -3,7 +3,7 @@ GET http://localhost:5052
 
 ###
 
-GET http://localhost:5052/api/categories
+GET http://localhost:5052/api/categories?searchValue = "Electronics"
 
 ###
 

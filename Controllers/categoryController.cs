@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommer_web_api.DTO;
 using ecommer_web_api.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,12 +26,41 @@ namespace ecommer_web_api.Controllers
                 return Ok(searchedCategories);
             }
 
-            return Ok(categories);
+            var categoryList = categories.Select(c => new CategoryReadDto{
+                CategoryId = c.CategoryId,
+                Name = c.Name,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt
+            }).ToList();
+
+            return Ok(categoryList);
+        }
+
+        /// GET: /api/categories/{categoryId} => read categories
+        [HttpGet("{categoryId:guid}")]
+        public IActionResult GetCategoryById(Guid categoryId)
+        {
+            //  Console.WriteLine($"Search Value: {searchValue}");
+            // if(!string.IsNullOrEmpty(searchValue))
+            // {
+            //     var searchedCategories = categories.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
+            // // Console.WriteLine($"Found Categories: {searchedCategories.Count}");
+            //     return Ok(searchedCategories);
+            // }
+
+            var foundCategory = categories.FirstOrDefault(c => c.CategoryId == categoryId);
+
+            if(foundCategory == null)
+            {
+                return NotFound("Category with this id does not exists");
+            }
+
+            return Ok(foundCategory);
         }
 
         /// POST: /api/categories => create a categories
         [HttpPost]
-        public IActionResult CreateCategories([FromBody] Category categoryData)
+        public IActionResult CreateCategories([FromBody] CategoryCreateDto categoryData)
         {
             /// input validation
             if(string.IsNullOrEmpty(categoryData.Name))
@@ -48,7 +78,15 @@ namespace ecommer_web_api.Controllers
 
             categories.Add(newCategory);
 
-            return Created($"/api/categories/{newCategory.CategoryId}", newCategory);
+            var categoryReadDto = new CategoryReadDto
+            {
+                CategoryId = newCategory.CategoryId,
+                Name = newCategory.Name,
+                Description = newCategory.Description,
+                CreatedAt = newCategory.CreatedAt
+            };
+
+            return Created($"/api/categories/{newCategory.CategoryId}", categoryReadDto);
         }
 
         /// DELETE: /api/categories => delete a category by id
@@ -68,7 +106,7 @@ namespace ecommer_web_api.Controllers
 
         /// PUT: /api/categories/{categoryId} => update a category
         [HttpPut("{categoryId:guid}")]
-        public IActionResult UpdateCategoryById(Guid categoriesId, [FromBody] Category categoryData)
+        public IActionResult UpdateCategoryById(Guid categoriesId, [FromBody] CategoryUpdateDto categoryData)
         {
             var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoriesId);
  

@@ -1,10 +1,12 @@
 using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using ecommer_web_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<CategoryService>();
 /// for controller
 builder.Services.AddControllers();
 /// For swagger api testing

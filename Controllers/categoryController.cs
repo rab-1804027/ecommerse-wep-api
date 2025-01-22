@@ -4,51 +4,46 @@ using System.Linq;
 using System.Threading.Tasks;
 using ecommer_web_api.DTO;
 using ecommer_web_api.Model;
+using ecommer_web_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ecommer_web_api.Controllers
 {
     [ApiController]
-    [Route("api/categories/")]
+    [Route("api/categories/")]  
     public class categoryController:ControllerBase
     {
-        private static List<Category> categories = new List<Category>();
+        // Defendency Injection
+        private CategoryService _categoryService;
+        public categoryController(CategoryService categoryService)
+        {
+            _categoryService = categoryService;
+            /// direct defendency
+        }
 
         /// GET: /api/categories => read categories
         [HttpGet]
         public IActionResult GetCategories([FromQuery] string searchValue = "")
         {
             //  Console.WriteLine($"Search Value: {searchValue}");
+
+            var categoryList = _categoryService.GetAllCategories();
+
             if(!string.IsNullOrEmpty(searchValue))
             {
-                var searchedCategories = categories.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
+                var searchedCategories = categoryList.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
             // Console.WriteLine($"Found Categories: {searchedCategories.Count}");
                 return Ok(searchedCategories);
-            }
-
-            var categoryList = categories.Select(c => new CategoryReadDto{
-                CategoryId = c.CategoryId,
-                Name = c.Name,
-                Description = c.Description,
-                CreatedAt = c.CreatedAt
-            }).ToList();
+            } 
 
             return Ok(categoryList);
         }
 
-        /// GET: /api/categories/{categoryId} => read categories
+         /// GET: /api/categories/{categoryId} => read categories
         [HttpGet("{categoryId:guid}")]
         public IActionResult GetCategoryById(Guid categoryId)
         {
-            //  Console.WriteLine($"Search Value: {searchValue}");
-            // if(!string.IsNullOrEmpty(searchValue))
-            // {
-            //     var searchedCategories = categories.Where(c=> !string.IsNullOrEmpty(searchValue) && c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase)).ToList();
-            // // Console.WriteLine($"Found Categories: {searchedCategories.Count}");
-            //     return Ok(searchedCategories);
-            // }
-
-            var foundCategory = categories.FirstOrDefault(c => c.CategoryId == categoryId);
+            var foundCategory = _categoryService.GetCategoryById(categoryId);
 
             if(foundCategory == null)
             {
@@ -58,7 +53,7 @@ namespace ecommer_web_api.Controllers
             return Ok(foundCategory);
         }
 
-        /// POST: /api/categories => create a categories
+         /// POST: /api/categories => create a categories
         [HttpPost]
         public IActionResult CreateCategories([FromBody] CategoryCreateDto categoryData)
         {
@@ -68,69 +63,42 @@ namespace ecommer_web_api.Controllers
                 return BadRequest("Category name is required and can not be empty");
             }
 
-            var newCategory = new Category
-            {
-                CategoryId = Guid.NewGuid(),
-                Name = categoryData.Name,
-                Description = categoryData.Description,
-                CreatedAt = DateTime.UtcNow
-            };
+            var categoryReadDto = _categoryService.CreateCategory(categoryData);
 
-            categories.Add(newCategory);
-
-            var categoryReadDto = new CategoryReadDto
-            {
-                CategoryId = newCategory.CategoryId,
-                Name = newCategory.Name,
-                Description = newCategory.Description,
-                CreatedAt = newCategory.CreatedAt
-            };
-
-            return Created($"/api/categories/{newCategory.CategoryId}", categoryReadDto);
-        }
-
-        /// DELETE: /api/categories => delete a category by id
-        [HttpDelete("{categoryId:guid}")]
-        public IActionResult DeleteCategoryById(Guid categoryId)
-        {
-            var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoryId);
-
-            if(foundCategory == null)
-            {
-                return NotFound("Category with this id does not exists");
-            }
-
-            categories.Remove(foundCategory);
-            return NoContent();
+            return Created($"/api/categories/{categoryReadDto.CategoryId}", categoryReadDto);
         }
 
         /// PUT: /api/categories/{categoryId} => update a category
         [HttpPut("{categoryId:guid}")]
-        public IActionResult UpdateCategoryById(Guid categoriesId, [FromBody] CategoryUpdateDto categoryData)
+        public IActionResult UpdateCategoryById(Guid categoryId, CategoryUpdateDto categoryData)
         {
-            var foundCategory = categories.FirstOrDefault(category => category.CategoryId == categoriesId);
+            if(categoryData == null)
+            {
+                return BadRequest("Category data is missing");
+            }
+            
+            var foundCategory = _categoryService.UpdateCategoryById(categoryId,categoryData);
  
             if(foundCategory == null)
             {
                 return NotFound("Category with this id does not exists");
             }
 
-            if(categoryData == null)
-            {
-                return BadRequest("Category data is missing");
-            }
-
-            if(!string.IsNullOrEmpty(categoryData.Name))
-            {
-                foundCategory.Name = categoryData.Name;
-            }
-            
-            if(!string.IsNullOrEmpty(categoryData.Description))
-            {
-                foundCategory.Description = categoryData.Description;
-            }
-
             return NoContent();
         }
-    }
+
+        /// DELETE: /api/categories => delete a category by id
+        [HttpDelete("{categoryId:guid}")]
+        public IActionResult DeleteCategoryById(Guid categoryId)
+        {
+            var foundCategory = _categoryService.DeleteCategoryById(categoryId);
+
+            if(!foundCategory)
+            {
+                return NotFound("Category with this id does not exists");
+            }
+ 
+            return NoContent();
+        }
+     }
 }

@@ -1,12 +1,17 @@
 using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using ecommer_web_api.data;
+using ecommer_web_api.Interfaces;
 using ecommer_web_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<CategoryService>();
+builder.Services.AddDbContext<AppDbContext> (options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ICategoryService,CategoryService>();
 /// for controller
 builder.Services.AddControllers();
 /// For swagger api testing

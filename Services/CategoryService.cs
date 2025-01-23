@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using ecommer_web_api.Controllers;
 using ecommer_web_api.DTO;
+using ecommer_web_api.Interfaces;
 using ecommer_web_api.Model;
 
 namespace ecommer_web_api.Services
 {
-    public class CategoryService
+    public class CategoryService:ICategoryService
     {
         private static readonly List<Category> _categories = new List<Category>();
 

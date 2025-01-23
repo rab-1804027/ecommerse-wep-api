@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ecommer_web_api.DTO;
+using ecommer_web_api.Interfaces;
 using ecommer_web_api.Model;
 using ecommer_web_api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,12 @@ namespace ecommer_web_api.Controllers
     public class categoryController:ControllerBase
     {
         // Defendency Injection
-        private CategoryService _categoryService;
-        public categoryController(CategoryService categoryService)
+        private ICategoryService _categoryService;
+        public categoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
             /// direct defendency
+            /// categoryService class er upr depend na kore upper class interface template er upr depend korteche
         }
 
         /// GET: /api/categories => read categories

@@ -12,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext> (options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ICategoryService,CategoryService>();
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 /// for controller
 builder.Services.AddControllers();
 /// For swagger api testing

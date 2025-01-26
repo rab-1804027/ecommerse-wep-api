@@ -25,11 +25,11 @@ namespace ecommer_web_api.Controllers
 
         /// GET: /api/categories => read categories
         [HttpGet]
-        public IActionResult GetCategories([FromQuery] string searchValue = "")
+        public async Task<IActionResult> GetCategories([FromQuery] string searchValue = "")
         {
             //  Console.WriteLine($"Search Value: {searchValue}");
 
-            var categoryList = _categoryService.GetAllCategories();
+            var categoryList = await _categoryService.GetAllCategories();
 
             if(!string.IsNullOrEmpty(searchValue))
             {
@@ -43,9 +43,9 @@ namespace ecommer_web_api.Controllers
 
          /// GET: /api/categories/{categoryId} => read categories
         [HttpGet("{categoryId:guid}")]
-        public IActionResult GetCategoryById(Guid categoryId)
+        public async Task<IActionResult> GetCategoryById(Guid categoryId)
         {
-            var foundCategory = _categoryService.GetCategoryById(categoryId);
+            var foundCategory = await _categoryService.GetCategoryById(categoryId);
 
             if(foundCategory == null)
             {
@@ -57,7 +57,7 @@ namespace ecommer_web_api.Controllers
 
          /// POST: /api/categories => create a categories
         [HttpPost]
-        public IActionResult CreateCategories([FromBody] CategoryCreateDto categoryData)
+        public async Task<IActionResult> CreateCategories([FromBody] CategoryCreateDto categoryData)
         {
             /// input validation
             if(string.IsNullOrEmpty(categoryData.Name))
@@ -65,21 +65,21 @@ namespace ecommer_web_api.Controllers
                 return BadRequest("Category name is required and can not be empty");
             }
 
-            var categoryReadDto = _categoryService.CreateCategory(categoryData);
+            var categoryReadDto = await _categoryService.CreateCategory(categoryData);
 
             return Created($"/api/categories/{categoryReadDto.CategoryId}", categoryReadDto);
         }
 
         /// PUT: /api/categories/{categoryId} => update a category
         [HttpPut("{categoryId:guid}")]
-        public IActionResult UpdateCategoryById(Guid categoryId, CategoryUpdateDto categoryData)
+        public async Task<IActionResult> UpdateCategoryById(Guid categoryId, CategoryUpdateDto categoryData)
         {
             if(categoryData == null)
             {
                 return BadRequest("Category data is missing");
             }
             
-            var foundCategory = _categoryService.UpdateCategoryById(categoryId,categoryData);
+            var foundCategory = await _categoryService.UpdateCategoryById(categoryId,categoryData);
  
             if(foundCategory == null)
             {
@@ -91,9 +91,9 @@ namespace ecommer_web_api.Controllers
 
         /// DELETE: /api/categories => delete a category by id
         [HttpDelete("{categoryId:guid}")]
-        public IActionResult DeleteCategoryById(Guid categoryId)
+        public async Task<IActionResult> DeleteCategoryById(Guid categoryId)
         {
-            var foundCategory = _categoryService.DeleteCategoryById(categoryId);
+            var foundCategory = await _categoryService.DeleteCategoryById(categoryId);
 
             if(!foundCategory)
             {

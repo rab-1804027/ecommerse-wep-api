@@ -8,14 +8,14 @@ namespace ecommer_web_api.Interfaces
 {
     public interface ICategoryService
     {
-        List<CategoryReadDto>GetAllCategories();
+        Task<List<CategoryReadDto>> GetAllCategories();
 
-        CategoryReadDto? GetCategoryById(Guid categoryId);
+        Task<CategoryReadDto?> GetCategoryById(Guid categoryId);
 
-        CategoryReadDto CreateCategory(CategoryCreateDto categoryData);
+        Task<CategoryReadDto> CreateCategory(CategoryCreateDto categoryData);
 
-        CategoryReadDto? UpdateCategoryById(Guid categoryId, CategoryUpdateDto categoryData);
+        Task<CategoryReadDto?> UpdateCategoryById(Guid categoryId, CategoryUpdateDto categoryData);
 
-        bool DeleteCategoryById(Guid categoryId);
+        Task<bool> DeleteCategoryById(Guid categoryId);
     }
 }
